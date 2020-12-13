@@ -1,5 +1,3 @@
-use snap::Snap;
-
 mod cli;
 mod error;
 mod gist;

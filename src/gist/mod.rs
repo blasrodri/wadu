@@ -7,13 +7,3 @@ pub struct Gist {
     pub cargo: String,
     pub main_rs: String,
 }
-
-impl Gist {
-    pub fn new(identifier: String, cargo: String, main_rs: String) -> Self {
-        Self {
-            identifier,
-            cargo,
-            main_rs,
-        }
-    }
-}
