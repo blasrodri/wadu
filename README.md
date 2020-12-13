@@ -1,8 +1,10 @@
-# Wadu - share your Rust snippets easily
+# Wadu - share your Rust snippets with ease
+
+**Note** Wadu is still work in progress.
 
 Wadu aims to be an alternative (and complement) to the Rust Playground.
 Its main goal is to provide an interface to share code/snippets written
-in Rust that can be ran and modified using a local environment.
+in Rust that can be run and modified using a local environment.
 
 ## How to install wadu
 
