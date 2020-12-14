@@ -1,5 +1,12 @@
-use crate::{error::WaduError, gist::fetch::load_gist, gist::Gist, runner::Runner};
-use std::{fs::File, io::Write, str::FromStr};
+use std::{
+    fs::File,
+    io::Write,
+    path::{Path, PathBuf},
+    process::{Command, ExitStatus},
+    str::FromStr,
+};
+
+use crate::{error::WaduError, gist::fetch::load_gist, gist::Gist};
 
 /// Holds the state to reproduce a code snippet.
 pub struct Snap {
@@ -44,11 +51,42 @@ impl Snap {
             SnapType::Gist => Ok(Snap::from(load_gist(identifier)?)),
         }
     }
-}
 
-impl Runner for Snap {
+    pub fn edit(&self, root_path: &str) -> Result<ExitStatus, WaduError> {
+        self.setup()?;
+
+        let mut result = Command::new("cargo")
+            .arg("run")
+            .current_dir(self.root_path(root_path))
+            .spawn()?;
+        let exit_status = result.wait()?;
+        Ok(exit_status)
+    }
+
+    pub fn run(&self, root_path: &str) -> Result<ExitStatus, WaduError> {
+        self.setup()?;
+        let mut result = Command::new("cargo")
+            .arg("run")
+            .current_dir(self.root_path(root_path))
+            .spawn()?;
+        let exit_status = result.wait()?;
+        Ok(exit_status)
+    }
+
+    fn root_path(&self, root_path: &str) -> PathBuf {
+        Path::new(root_path).join(self.get_identifier().to_string())
+    }
     fn get_identifier(&self) -> &str {
         self.identifier.as_str()
+    }
+
+    fn setup(&self) -> Result<(), WaduError> {
+        use std::{fs::create_dir_all, path::Path};
+        let path = Path::new("/tmp").join(self.get_identifier()).join("src");
+        // create dir
+        let result = create_dir_all(path.as_path())?;
+        self.store_files()?;
+        Ok(result)
     }
 
     fn store_files(&self) -> Result<(), WaduError> {
